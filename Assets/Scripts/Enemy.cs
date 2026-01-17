@@ -6,13 +6,27 @@ public class Enemy : MonoBehaviour
     [SerializeField] float speed = 3;
     [SerializeField] Vector3 target = Vector3.zero;
     [SerializeField] string bulletTag = "Bullet";
-    [SerializeField] string targetTag = "TrashPile";
+    [SerializeField] string trashTag = "TrashPile";
+    [SerializeField] float gameEdge = 50;
+    [SerializeField] GameObject trashDisplay;
+    [SerializeField] GameObject droppedTrashPrefab;
+    
+    private float trashAmount = 0;
 
     private Rigidbody rb;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        trashDisplay.SetActive(false);
+    }
+
+    void Update()
+    {
+        if (transform.position.sqrMagnitude > gameEdge * gameEdge)
+        {
+            Destroy(gameObject);
+        }
     }
 
     void FixedUpdate()
@@ -30,12 +44,29 @@ public class Enemy : MonoBehaviour
     {
         if (collision.gameObject.tag.Equals(bulletTag))
         {
-            Destroy(gameObject);
-        } 
-        else if (collision.gameObject.tag.Equals(targetTag))
-        {
+            if (trashAmount != 0)
+            {
+                Instantiate(droppedTrashPrefab, transform.position, transform.rotation);
+            }
+
             Destroy(gameObject);
         }
+    }
 
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == trashTag)
+        {
+            target = (transform.position - target).normalized * 100;
+            
+            TrashPile pile = other.GetComponent<TrashPile>();
+            
+            if (pile.trashAmount > 0) {
+                Debug.Log("Stealing Trash");
+                pile.StealTrash(1);
+                trashAmount = 1;
+                trashDisplay.SetActive(true);
+            }
+        }
     }
 }

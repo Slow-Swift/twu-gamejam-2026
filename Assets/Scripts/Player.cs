@@ -11,8 +11,13 @@ public class Player : MonoBehaviour
     [SerializeField] GameObject bulletPrefab;
     [SerializeField] Transform bulletSpawn;
 
+    [SerializeField] LayerMask trashLayer;
+    [SerializeField] string trashPileTag = "TrashPile";
+
+
     Rigidbody rb;
     Vector2 movement;
+    public int heldTrash {get; private set;}
 
     // Get a reference to the rigidbody component
     void Start()
@@ -48,5 +53,21 @@ public class Player : MonoBehaviour
 
         // Set the player's velocity to the inputted movement
         rb.linearVelocity = transform.forward * movement.magnitude * speed;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if ((trashLayer.value & (1 << other.gameObject.layer)) != 0)
+        {
+            Destroy(other.gameObject);
+            heldTrash += 1;
+        }
+
+        if (other.tag == trashPileTag)
+        {
+            other.gameObject.GetComponent<TrashPile>().
+                ReturnTrash(heldTrash);
+            heldTrash = 0;
+        }
     }
 }
