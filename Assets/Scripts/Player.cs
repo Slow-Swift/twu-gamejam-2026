@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Player : MonoBehaviour
@@ -11,8 +12,15 @@ public class Player : MonoBehaviour
     [SerializeField] GameObject bulletPrefab;
     [SerializeField] Transform bulletSpawn;
 
-    Rigidbody rb;
-    Vector2 movement;
+    [SerializeField] float reloadcap = 2f;
+
+    private float lastshottime = 0f;
+
+    private Rigidbody rb;
+    private Vector2 movement;
+
+    public Image ReloadBar;
+
 
     // Get a reference to the rigidbody component
     void Start()
@@ -30,7 +38,15 @@ public class Player : MonoBehaviour
 
     public void OnShoot()
     {
+        // We only want to shoot when the shoot button is pressed
+        if (!context.performed) return;
+
+        // Shoot a bullet and start the reload timer where the player can't shoot again until the timer is up
+       
+        if (Time.time - lastshottime < reloadcap) return;
         Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation);
+        lastshottime = Time.time; // Update the last shot time to a baseline for next calculation
+        
     }
 
     void FixedUpdate()
@@ -49,4 +65,11 @@ public class Player : MonoBehaviour
         // Set the player's velocity to the inputted movement
         rb.linearVelocity = transform.forward * movement.magnitude * speed;
     }
+    void Update()
+    {
+        float progress = (Time.time - lastshottime) / reloadcap;
+        ReloadBar.fillAmount =  Math.Clamp(progress, 0f, 1f);//MathF.clamp(progress);
+        Debug.Log(ReloadBar.fillAmount);
+    }
+
 }
