@@ -5,13 +5,15 @@ using UnityEngine.InputSystem;
 public class Player : MonoBehaviour
 {
 
-    [SerializeField]
-    private float speed = 10;
+    [SerializeField] float speed = 10;
+    
+    [SerializeField] GameObject bulletPrefab;
+    [SerializeField] Transform bulletSpawn;
 
     private Rigidbody rb;
     private Vector2 movement;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    // Get a reference to the rigidbody component
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -20,6 +22,14 @@ public class Player : MonoBehaviour
     public void OnMove(InputAction.CallbackContext context)
     {   
         movement = speed * context.ReadValue<Vector2>();
+    }
+
+    public void OnShoot(InputAction.CallbackContext context)
+    {
+        // We only want to shoot when the shoot button is pressed
+        if (!context.performed) return;
+
+        Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation);
     }
 
     void FixedUpdate()
