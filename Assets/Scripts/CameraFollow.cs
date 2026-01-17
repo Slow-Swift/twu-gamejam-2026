@@ -1,12 +1,24 @@
 using System;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class CameraFollow : MonoBehaviour
 {
-    [SerializeField] GameObject target;
-    [SerializeField] Vector3 offset;
+    [SerializeField] Transform target;
+    [SerializeField] float pitch;
+    [SerializeField] float yaw;
+    [SerializeField] float distance = 10;
+    [SerializeField] float sensistivityX = 5;
+    [SerializeField] float sensistivityY = 1;
 
-    // Update is called once per frame
+
+    InputAction moveCameraInput;
+
+    void Start()
+    {
+        moveCameraInput = InputSystem.actions.FindAction("Camera");
+    }
+
     void Update()
     {
         if (target == null)
@@ -14,6 +26,18 @@ public class CameraFollow : MonoBehaviour
             Debug.LogWarning("Camera follow target not assigned");
         }
 
-        transform.position = target.transform.position + offset;
+        Vector2 movement = moveCameraInput.ReadValue<Vector2>();
+
+        pitch = Mathf.Clamp(pitch - movement.y * sensistivityY, 0, 89);
+        yaw += movement.x * sensistivityX;
+
+        Vector3 direction = new Vector3(
+            Mathf.Sin(yaw * Mathf.Deg2Rad) * Mathf.Cos(pitch * Mathf.Deg2Rad),
+            Mathf.Sin(pitch * Mathf.Deg2Rad),
+            Mathf.Cos(yaw * Mathf.Deg2Rad) * Mathf.Cos(pitch * Mathf.Deg2Rad)
+        );
+
+        transform.position = target.transform.position + direction * distance;
+        transform.LookAt(target);
     }
 }
