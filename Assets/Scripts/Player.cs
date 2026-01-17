@@ -26,14 +26,17 @@ public class Player : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        InputSystem.actions.FindAction("Move").performed += ctx => OnMove(ctx.ReadValue<Vector2>());
+        InputSystem.actions.FindAction("Move").canceled += ctx => OnMove(ctx.ReadValue<Vector2>());
+        InputSystem.actions.FindAction("Shoot").performed += ctx => OnShoot();
     }
 
-    public void OnMove(InputAction.CallbackContext context)
+    public void OnMove(Vector2 movement)
     {   
-        movement = speed * context.ReadValue<Vector2>();
+        this.movement = movement;
     }
 
-    public void OnShoot(InputAction.CallbackContext context)
+    public void OnShoot()
     {
         // We only want to shoot when the shoot button is pressed
         if (!context.performed) return;
@@ -48,30 +51,20 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-        UpdateDirection();
+        Vector3 forward = Camera.main.transform.forward;
+        forward.y = 0;
+        forward.Normalize();
+
+        Vector3 movementDirection = new Vector3(movement.x, 0, movement.y).normalized;
+        if (movementDirection.sqrMagnitude > 0.05)
+        {
+            transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
+            transform.rotation = Quaternion.LookRotation(transform.localToWorldMatrix * movementDirection, Vector3.up);
+        }
 
         // Set the player's velocity to the inputted movement
-        rb.linearVelocity = new Vector3(
-            movement.x,
-            0,
-            movement.y
-        );
+        rb.linearVelocity = transform.forward * movement.magnitude * speed;
     }
-
-    void UpdateDirection()
-    {
-        Ray mouseRay = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-        RaycastHit hitInfo;
-
-        if (Physics.Raycast(mouseRay, out hitInfo))
-        {
-            Vector3 direction = hitInfo.point - transform.position;
-            direction.y = 0;
-
-            transform.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
-        }
-    }
-
     void Update()
     {
         float progress = (Time.time - lastshottime) / reloadcap;
