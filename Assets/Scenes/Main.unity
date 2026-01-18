@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 0d5771081eb9abb43b1792b52260d914, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -1286,12 +1286,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   speed: 5
+  boostedSpeed: 30
   bulletPrefab: {fileID: 3892792654976855138, guid: 7e39e4acb26f1a38597ecbc8d32ffd66, type: 3}
   bulletSpawn: {fileID: 1212027128}
   trashLayer:
     serializedVersion: 2
     m_Bits: 8
   trashPileTag: TrashPile
+  minForce: 10
+  maxForce: 25
+  maxChargeTime: 1.2
+  chargeTime: 0
+  isCharging: 0
+  inputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
 --- !u!54 &1681837563
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1317,7 +1324,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 112
+  m_Constraints: 116
   m_CollisionDetection: 0
 --- !u!1 &1866944462
 GameObject:

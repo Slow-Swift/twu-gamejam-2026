@@ -151,7 +151,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 52
+  m_Constraints: 116
   m_CollisionDetection: 0
 --- !u!114 &6128410898941786063
 MonoBehaviour:
@@ -172,6 +172,9 @@ MonoBehaviour:
   gameEdge: 50
   trashDisplay: {fileID: 1040593422292296933}
   droppedTrashPrefab: {fileID: 6600065998822471571, guid: bf20b3d4258fd5098898ec464c7f0453, type: 3}
+  health: 3
+  droppedPowerUpsPrefab: {fileID: 4953249315447518637, guid: 3d6b9973f1073724c9dd8d099193f8bb, type: 3}
+  dropChance: 0.5
 --- !u!136 &3699579110731237717
 CapsuleCollider:
   m_ObjectHideFlags: 0
