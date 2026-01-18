@@ -6,7 +6,6 @@ public class Enemy : MonoBehaviour
 {
     [SerializeField] float speed = 3;
     [SerializeField] Vector3 target = Vector3.zero;
-    [SerializeField] string bulletTag = "Bullet";
     [SerializeField] string trashTag = "TrashPile";
     [SerializeField] float gameEdge = 50;
     [SerializeField] GameObject trashDisplay;
@@ -17,7 +16,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] Image healthSlider;
 
     private float trashAmount = 0;
-    private int health;
+    private float health;
 
     private Rigidbody rb;
 
@@ -54,15 +53,7 @@ public class Enemy : MonoBehaviour
         rb.linearVelocity = toTarget.normalized * speed;
     }
 
-    void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.tag.Equals(bulletTag))
-        {
-            TakeDamage(1);
-        }
-    }
-
-    void TakeDamage(int amount)
+    public void TakeDamage(float amount)
     {
         health -= amount;
         // Hard coded, I know. IDK right now

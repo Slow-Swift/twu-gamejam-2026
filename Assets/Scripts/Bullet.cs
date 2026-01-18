@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -6,6 +7,10 @@ public class Bullet : MonoBehaviour
 
     [SerializeField] float initialVelocity;
     [SerializeField] float lifeTimeSeconds = 3f;
+    [SerializeField] string enemyTag = "Enemy";
+
+    public float damage;
+
     Rigidbody rb;
     void Awake()
     {
@@ -20,7 +25,11 @@ public class Bullet : MonoBehaviour
     }
      void OnCollisionEnter(Collision collision)
     {
-        // TODO: Should probably limit what collisions this happens on
+        if (collision.gameObject.tag.Equals(enemyTag))
+        {
+            collision.gameObject.GetComponent<Enemy>().TakeDamage(damage);
+        }
+        
         Destroy(gameObject);
     }
 }

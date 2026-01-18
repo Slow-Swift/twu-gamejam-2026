@@ -20,12 +20,18 @@ public class Player : MonoBehaviour
     [SerializeField] float maxForce = 60f;
     [SerializeField] float maxChargeTime = 2f;
     [SerializeField] float chargeTime = 0f;
-    [SerializeField] bool isCharging = false;
+    [SerializeField] Vector2 damageRange;
+    [SerializeField] GameObject trajectory;
+    [SerializeField] Vector2 trajectoryRange;
+    [SerializeField] Material trajectoryMaterial;
+    [SerializeField] Gradient trajectoryGradient;
+
+    float chargeStartTime;
+    bool isCharging = false;
 
     Rigidbody rb;
     Vector2 movement;
     [SerializeField] InputActionAsset inputActions;
-    InputAction shootAction;
     public int heldTrash {get; private set;}
 
     // Get a reference to the rigidbody component
@@ -34,10 +40,8 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         InputSystem.actions.FindAction("Move").performed += ctx => OnMove(ctx.ReadValue<Vector2>());
         InputSystem.actions.FindAction("Move").canceled += ctx => OnMove(ctx.ReadValue<Vector2>());
-        shootAction = InputSystem.actions.FindAction("Shoot");
-        shootAction.Enable();
-        shootAction.started += OnShoot;
-        shootAction.canceled += OnShoot;
+        InputSystem.actions.FindAction("Shoot").started += ctx => ShootPressed();
+        InputSystem.actions.FindAction("Shoot").canceled += ctx => ShootReleased();
     }
 
     public void OnMove(Vector2 movement)
@@ -47,41 +51,48 @@ public class Player : MonoBehaviour
 
     void Update()
     {
+        trajectory.SetActive(isCharging);
         if (isCharging)
         {
             chargeTime += Time.deltaTime;
             chargeTime = Mathf.Clamp(chargeTime, 0f, maxChargeTime);
-            Debug.Log($"Charging... chargeTime = {chargeTime}");
+            float chargePercent = Mathf.Clamp((Time.time - chargeStartTime) / maxChargeTime, 0, 1);
+            trajectory.transform.localScale = new Vector3(
+                1, 1, 
+                Mathf.Lerp(trajectoryRange.x, trajectoryRange.y, chargePercent)
+            );
+            trajectoryMaterial.color = trajectoryGradient.Evaluate(chargePercent);
+            Debug.Log($"Charging... chargeTime = {chargeTime}, {chargePercent}");
         }
     }
 
-    public void OnShoot(InputAction.CallbackContext ctx)
+    void ShootPressed()
     {
-        if (ctx.started)
+        Debug.Log("Shoot Pressed");
+        isCharging = true;
+        chargeStartTime = Time.time;
+    }
+
+    void ShootReleased()
+    {
+        Debug.Log("Shoot Released");
+
+        if (isCharging)
         {
-            if (!isCharging)
-            {
-                isCharging = true;
-                chargeTime = 0f;
-                Debug.Log("Started charging");
-            }
-        }
-        if (ctx.canceled)
-        {
-            if (isCharging)
-            {
-                isCharging = false;
-                Debug.Log($"Stopped charging at chargeTime={chargeTime}");
-                float percent = Mathf.Clamp01(chargeTime / maxChargeTime);
-                percent = percent * percent;
-                float force = Mathf.Lerp(minForce, maxForce, percent);
-                GameObject bullet = Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation);
-                Bullet bulletScript = bullet.GetComponent<Bullet>();
-                bulletScript.SetInitialVelocity(force);
-                Debug.Log($"Spawning bullet: force={force} chargeTime={chargeTime}");
-            }
+            isCharging = false;
+            Debug.Log($"Stopped charging at chargeTime={chargeTime}");
+            float percent = Mathf.Clamp01(chargeTime / maxChargeTime);
+            percent = percent * percent;
+            float force = Mathf.Lerp(minForce, maxForce, percent);
+            GameObject bullet = Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation);
+            Bullet bulletScript = bullet.GetComponent<Bullet>();
+            bulletScript.SetInitialVelocity(force);
+            bulletScript.damage = Mathf.Lerp(damageRange.x, damageRange.y, percent);
+            Debug.Log($"Spawning bullet: force={force} chargeTime={chargeTime}");
+            chargeTime = 0;
         }
     }
+
     public void ActivatePowerUp(PowerUpType type, float duration)
     {
         switch (type)
@@ -109,6 +120,12 @@ public class Player : MonoBehaviour
         forward.y = 0;
         forward.Normalize();
         Vector3 movementDirection = new Vector3(movement.x, 0, movement.y).normalized;
+
+        // ## New movement style
+        // transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
+        // rb.linearVelocity = transform.localToWorldMatrix * movementDirection * speed;
+        
+        // ## Old movement style:
         if (movementDirection.sqrMagnitude > 0.05)
         {
             transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
