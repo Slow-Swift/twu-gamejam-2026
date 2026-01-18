@@ -5,6 +5,8 @@ public class EnemySpawner : MonoBehaviour
 
     [SerializeField] GameObject enemyPrefab;
 
+    [SerializeField] Transform trashPile;
+
     [SerializeField] float minSpawnRange;
     [SerializeField] float maxSpawnRange;
     [SerializeField] float density;
@@ -34,7 +36,9 @@ public class EnemySpawner : MonoBehaviour
             spawnDirection.x * distance, 0, spawnDirection.y * distance
         );
 
-        Instantiate(enemyPrefab, spawnPosition, Quaternion.identity, transform);
+        GameObject enemyobj = Instantiate(enemyPrefab, spawnPosition, Quaternion.identity, transform);
+        Enemy enemy = enemyobj.GetComponent<Enemy>();
+        enemy.SetTarget(trashPile);
         nextSpawnTime += Random.Range(0.5f, 1.5f) / density;
     }
 }
