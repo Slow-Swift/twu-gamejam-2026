@@ -75,7 +75,12 @@ public class Enemy : MonoBehaviour
     {
         if (other.tag == trashTag)
         {
-            target = (transform.position - target).normalized * 100;
+            // Just go away
+            Vector3 newTarget = (transform.position - target).normalized * 60;
+            newTarget.y = 0;
+            Debug.Log(newTarget);
+
+            agent.SetDestination(newTarget);
             
             TrashPile pile = other.GetComponent<TrashPile>();
             
