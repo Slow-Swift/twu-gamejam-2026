@@ -990,7 +990,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d04a4e6303330e72bb197ee33733cb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrashPile
-  healthSlider: {fileID: 912191399}
 --- !u!1 &1212027127
 GameObject:
   m_ObjectHideFlags: 0
@@ -1725,7 +1724,7 @@ MonoBehaviour:
   enemyPrefab: {fileID: 8068765551063128475, guid: 43e4d278298743788a22f13e54faff2c, type: 3}
   minSpawnRange: 20
   maxSpawnRange: 40
-  density: 1
+  density: 0.3
   spawnStartWaitTime: 1
 --- !u!4 &2071869997
 Transform:
