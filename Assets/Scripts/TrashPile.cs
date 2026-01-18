@@ -4,10 +4,8 @@ using UnityEngine.UI;
 
 public class TrashPile : MonoBehaviour
 {
-    [SerializeField] Image healthSlider;
     
     public int trashAmount { get; private set; } = 100;
-
 
     public void StealTrash(int amount)
     {
@@ -17,13 +15,10 @@ public class TrashPile : MonoBehaviour
             trashAmount = 0;
             SceneManager.LoadSceneAsync("GameOver");
         }
-
-        healthSlider.fillAmount = trashAmount / 100f;
     }
 
     public void ReturnTrash(int amount)
     {
         trashAmount += amount;
-        healthSlider.fillAmount = trashAmount / 100f;
     }
 }
