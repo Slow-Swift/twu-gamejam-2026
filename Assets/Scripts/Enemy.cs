@@ -43,9 +43,23 @@ public class Enemy : MonoBehaviour
         trashDisplay.SetActive(false);
     }
 
-    void Update()
+    // void Update()
+    // {
+    //     if (transform.position.sqrMagnitude > gameEdge * gameEdge)
+    //     {
+    //         if(trashAmount > 0)
+    //         {
+    //             Debug.Log($"Lost Trash: {trashAmount}");
+    //         }
+    //         Destroy(gameObject);
+    //     }
+        
+    // }
+
+
+     void Update()
     {
-        if (transform.position.sqrMagnitude > gameEdge * gameEdge)
+         if (transform.position.sqrMagnitude > gameEdge * gameEdge)
         {
             if(trashAmount > 0)
             {
@@ -54,11 +68,6 @@ public class Enemy : MonoBehaviour
             Destroy(gameObject);
         }
         
-    }
-
-
-     void Update()
-    {
         if (!agent.pathPending && agent.remainingDistance < repathdistance)
         {
             PickNewGoal();
@@ -106,7 +115,8 @@ public class Enemy : MonoBehaviour
     {
         if (other.tag == trashTag)
         {
-            target = (transform.position - target).normalized * 100;
+            UnityEngine.Vector3 direction = (transform.position - target.position).normalized * 100;
+            agent.SetDestination(transform.position + direction);
             
             TrashPile pile = other.GetComponent<TrashPile>();
             
