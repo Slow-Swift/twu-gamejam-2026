@@ -14,7 +14,12 @@ public class Enemy : MonoBehaviour
     [SerializeField] Transform target;
 
     [SerializeField] string bulletTag = "Bullet";
-    [SerializeField] string targetTag = "TrashPile";
+    [SerializeField] string trashTag = "TrashPile";
+    [SerializeField] float gameEdge = 50;
+    [SerializeField] GameObject trashDisplay;
+    [SerializeField] GameObject droppedTrashPrefab;
+    
+    private float trashAmount = 0;
 
     [Header("Target Settings")]
 
@@ -35,6 +40,20 @@ public class Enemy : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         agent.stoppingDistance = 0.5f;
         agent.autoBraking = false;
+        trashDisplay.SetActive(false);
+    }
+
+    void Update()
+    {
+        if (transform.position.sqrMagnitude > gameEdge * gameEdge)
+        {
+            if(trashAmount > 0)
+            {
+                Debug.Log($"Lost Trash: {trashAmount}");
+            }
+            Destroy(gameObject);
+        }
+        
     }
 
 
@@ -73,12 +92,30 @@ public class Enemy : MonoBehaviour
     {
         if (collision.gameObject.tag.Equals(bulletTag))
         {
-            Destroy(gameObject);
-        } 
-        else if (collision.gameObject.tag.Equals(targetTag))
-        {
-            Destroy(gameObject);
-        }
+            if (trashAmount != 0)
+            {
+                Instantiate(droppedTrashPrefab, transform.position, transform.rotation);
+            }
 
+            Destroy(gameObject);
+            Destroy(collision.gameObject);
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == trashTag)
+        {
+            target = (transform.position - target).normalized * 100;
+            
+            TrashPile pile = other.GetComponent<TrashPile>();
+            
+            if (pile.trashAmount > 0) {
+                Debug.Log("Stealing Trash");
+                pile.StealTrash(1);
+                trashAmount = 1;
+                trashDisplay.SetActive(true);
+            }
+        }
     }
 }

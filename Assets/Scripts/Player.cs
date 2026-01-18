@@ -12,12 +12,17 @@ public class Player : MonoBehaviour
     [SerializeField] GameObject bulletPrefab;
     [SerializeField] Transform bulletSpawn;
 
+    [SerializeField] LayerMask trashLayer;
+    [SerializeField] string trashPileTag = "TrashPile";
+
+
     [SerializeField] float reloadcap = 2f;
 
     private float lastshottime = 0f;
 
     private Rigidbody rb;
     private Vector2 movement;
+    public int heldTrash {get; private set;}
 
     public Image ReloadBar;
 
@@ -64,6 +69,23 @@ public class Player : MonoBehaviour
 
         // Set the player's velocity to the inputted movement
         rb.linearVelocity = transform.forward * movement.magnitude * speed;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if ((trashLayer.value & (1 << other.gameObject.layer)) != 0)
+        {
+            Destroy(other.gameObject);
+            heldTrash += 1;
+            Debug.Log(heldTrash);
+        }
+
+        if (other.tag == trashPileTag)
+        {
+            other.gameObject.GetComponent<TrashPile>().
+                ReturnTrash(heldTrash);
+            heldTrash = 0;
+        }
     }
     void Update()
     {
