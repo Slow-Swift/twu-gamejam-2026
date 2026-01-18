@@ -5,14 +5,20 @@ public class Bullet : MonoBehaviour
 {
 
     [SerializeField] float initialVelocity;
-
-    void Start()
+    [SerializeField] float lifeTimeSeconds = 3f;
+    Rigidbody rb;
+    void Awake()
     {
         // Sets the initial velocity of the bullet. Could maybe move this to the player/crossbow
-        GetComponent<Rigidbody>().linearVelocity = transform.forward * initialVelocity;
+        rb = GetComponent<Rigidbody>();
     }
 
-    void OnCollisionEnter(Collision collision)
+    public void SetInitialVelocity(float velocity)
+    {
+        rb.linearVelocity = transform.forward * velocity;
+        Destroy(gameObject, lifeTimeSeconds);
+    }
+     void OnCollisionEnter(Collision collision)
     {
         // TODO: Should probably limit what collisions this happens on
         Destroy(gameObject);

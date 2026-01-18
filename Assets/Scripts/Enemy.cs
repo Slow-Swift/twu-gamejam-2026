@@ -10,7 +10,10 @@ public class Enemy : MonoBehaviour
     [SerializeField] float gameEdge = 50;
     [SerializeField] GameObject trashDisplay;
     [SerializeField] GameObject droppedTrashPrefab;
-    
+    [SerializeField] int health = 4;
+    [SerializeField] GameObject droppedPowerUpsPrefab;
+    [SerializeField] float dropChance = 0.5f;
+
     private float trashAmount = 0;
 
     private Rigidbody rb;
@@ -48,8 +51,15 @@ public class Enemy : MonoBehaviour
             {
                 Instantiate(droppedTrashPrefab, transform.position, transform.rotation);
             }
-
-            Destroy(gameObject);
+            health -= 1;
+            if (health <= 0)
+            {
+                if (Random.value <= dropChance)
+                {
+                    Instantiate(droppedPowerUpsPrefab, transform.position, transform.rotation);
+                }
+                Destroy(gameObject);
+            }
         }
     }
 
