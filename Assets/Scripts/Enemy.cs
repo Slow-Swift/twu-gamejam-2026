@@ -12,7 +12,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] GameObject droppedTrashPrefab;
     [SerializeField] int maxHealth = 4;
     [SerializeField] GameObject droppedPowerUpsPrefab;
-    [SerializeField] float dropChance = 0.5f;
+    [SerializeField] float dropChance = 0.1f;
     [SerializeField] Image healthSlider;
 
     private float trashAmount = 0;
