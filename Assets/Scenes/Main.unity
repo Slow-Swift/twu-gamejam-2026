@@ -310,7 +310,7 @@ GameObject:
   m_Component:
   - component: {fileID: 214977513}
   - component: {fileID: 214977514}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Trash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1784,7 +1784,7 @@ MonoBehaviour:
   bulletSpawn: {fileID: 1212027128}
   trashLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   trashPileTag: TrashPile
   reloadcap: 2
   ReloadBar: {fileID: 2143266093}
