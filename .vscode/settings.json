@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "MouseGame.slnx"
+    "dotnet.defaultSolution": "twu-gamejam-2026.slnx"
 }
