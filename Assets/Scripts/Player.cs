@@ -18,6 +18,9 @@ public class Player : MonoBehaviour
 
     [SerializeField] float reloadcap = 2f;
 
+    [SerializeField] AudioClip attackSound;
+    AudioSource audioSource;
+
     private float lastshottime = 0f;
 
     private Rigidbody rb;
@@ -26,9 +29,12 @@ public class Player : MonoBehaviour
 
     public Image ReloadBar;
 
-    [SerializeField] AudioClip attackSound;
-    AudioSource audioSource;
 
+
+    void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
 
     // Get a reference to the rigidbody component
     void Start()
@@ -98,9 +104,6 @@ public class Player : MonoBehaviour
         Debug.Log(ReloadBar.fillAmount);
     }
 
-      void Awake()
-    {
-        audioSource = GetComponent<AudioSource>();
-    }
+      
 
 }
