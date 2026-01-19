@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
@@ -8,38 +9,31 @@ public class Player : MonoBehaviour
 {
 
     [SerializeField] float speed = 10;
-<<<<<<< HEAD
     private bool isSpeedBoosted = false;
     [SerializeField] float boostedSpeed = 20;
-=======
-    
->>>>>>> 566e88f4ee128e715029595e06b61cc4d78764a2
     [SerializeField] GameObject bulletPrefab;
     [SerializeField] Transform bulletSpawn;
 
     [SerializeField] LayerMask trashLayer;
     [SerializeField] string trashPileTag = "TrashPile";
 
+    [SerializeField] float minForce = 20f;
+    [SerializeField] float maxForce = 60f;
+    [SerializeField] float maxChargeTime = 2f;
+    [SerializeField] float chargeTime = 0f;
+    [SerializeField] Vector2 damageRange;
+    [SerializeField] GameObject trajectory;
+    [SerializeField] Vector2 trajectoryRange;
+    [SerializeField] Material trajectoryMaterial;
+    [SerializeField] Gradient trajectoryGradient;
 
-    [SerializeField] float reloadcap = 2f;
+    float chargeStartTime;
+    bool isCharging = false;
 
-    [SerializeField] AudioClip attackSound;
-    AudioSource audioSource;
-
-    private float lastshottime = 0f;
-
-    private Rigidbody rb;
-    private Vector2 movement;
+    Rigidbody rb;
+    Vector2 movement;
+    [SerializeField] InputActionAsset inputActions;
     public int heldTrash {get; private set;}
-
-    public Image ReloadBar;
-
-
-
-    void Awake()
-    {
-        audioSource = GetComponent<AudioSource>();
-    }
 
     // Get a reference to the rigidbody component
     void Start()
@@ -47,7 +41,8 @@ public class Player : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         InputSystem.actions.FindAction("Move").performed += ctx => OnMove(ctx.ReadValue<Vector2>());
         InputSystem.actions.FindAction("Move").canceled += ctx => OnMove(ctx.ReadValue<Vector2>());
-        InputSystem.actions.FindAction("Shoot").performed += ctx => OnShoot();
+        InputSystem.actions.FindAction("Shoot").started += ctx => ShootPressed();
+        InputSystem.actions.FindAction("Shoot").canceled += ctx => ShootReleased();
     }
 
     public void OnMove(Vector2 movement)
@@ -55,18 +50,69 @@ public class Player : MonoBehaviour
         this.movement = movement;
     }
 
-    public void OnShoot()
+    void Update()
     {
-        // We only want to shoot when the shoot button is pressed
-        //if (!context.performed) return;
+        trajectory.SetActive(isCharging);
+        if (isCharging)
+        {
+            chargeTime += Time.deltaTime;
+            chargeTime = Mathf.Clamp(chargeTime, 0f, maxChargeTime);
+            float chargePercent = Mathf.Clamp((Time.time - chargeStartTime) / maxChargeTime, 0, 1);
+            trajectory.transform.localScale = new Vector3(
+                1, 1, 
+                Mathf.Lerp(trajectoryRange.x, trajectoryRange.y, chargePercent)
+            );
+            trajectoryMaterial.color = trajectoryGradient.Evaluate(chargePercent);
+            Debug.Log($"Charging... chargeTime = {chargeTime}, {chargePercent}");
+        }
+    }
 
-        // Shoot a bullet and start the reload timer where the player can't shoot again until the timer is up
-       
-        if (Time.time - lastshottime < reloadcap) return;
-        Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation);
-        audioSource.PlayOneShot(attackSound);
-        lastshottime = Time.time; // Update the last shot time to a baseline for next calculation
-        
+    void ShootPressed()
+    {
+        Debug.Log("Shoot Pressed");
+        isCharging = true;
+        chargeStartTime = Time.time;
+    }
+
+    void ShootReleased()
+    {
+        Debug.Log("Shoot Released");
+
+        if (isCharging)
+        {
+            isCharging = false;
+            Debug.Log($"Stopped charging at chargeTime={chargeTime}");
+            float percent = Mathf.Clamp01(chargeTime / maxChargeTime);
+            percent = percent * percent;
+            float force = Mathf.Lerp(minForce, maxForce, percent);
+            GameObject bullet = Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation);
+            Bullet bulletScript = bullet.GetComponent<Bullet>();
+            bulletScript.SetInitialVelocity(force);
+            bulletScript.damage = Mathf.Lerp(damageRange.x, damageRange.y, percent);
+            Debug.Log($"Spawning bullet: force={force} chargeTime={chargeTime}");
+            chargeTime = 0;
+        }
+    }
+
+    public void ActivatePowerUp(PowerUpType type, float duration)
+    {
+        switch (type)
+        {
+            case PowerUpType.Speed:
+                if (!isSpeedBoosted)
+                StartCoroutine(SpeedBoost(duration));
+                break;
+        }
+    }
+
+    private IEnumerator SpeedBoost(float duration)
+    {
+        isSpeedBoosted = true;
+        float originalSpeed = speed;
+        speed = boostedSpeed;
+        yield return new WaitForSeconds(duration);
+        speed = originalSpeed;
+        isSpeedBoosted = false;
     }
 
     void FixedUpdate()
@@ -74,8 +120,13 @@ public class Player : MonoBehaviour
         Vector3 forward = Camera.main.transform.forward;
         forward.y = 0;
         forward.Normalize();
-
         Vector3 movementDirection = new Vector3(movement.x, 0, movement.y).normalized;
+
+        // ## New movement style
+        // transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
+        // rb.linearVelocity = transform.localToWorldMatrix * movementDirection * speed;
+        
+        // ## Old movement style:
         if (movementDirection.sqrMagnitude > 0.05)
         {
             transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
@@ -95,20 +146,17 @@ public class Player : MonoBehaviour
             Debug.Log(heldTrash);
         }
 
-        else if (other.tag == trashPileTag)
+        if (other.tag == trashPileTag)
         {
             other.gameObject.GetComponent<TrashPile>().
                 ReturnTrash(heldTrash);
             heldTrash = 0;
         }
     }
-    void Update()
+
+    void OnDestroy()
     {
-        float progress = (Time.time - lastshottime) / reloadcap;
-        ReloadBar.fillAmount =  Math.Clamp(progress, 0f, 1f);//MathF.clamp(progress);
-        Debug.Log(ReloadBar.fillAmount);
+        //shootAction.started -= OnShoot;
+        //shootAction.canceled -= OnShoot;
     }
-
-      
-
 }
