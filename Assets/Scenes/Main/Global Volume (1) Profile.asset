@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29fa0085f50d5e54f8144f766051a691, type: 3}
   m_Name: FilmGrain
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.FilmGrain
-  active: 0
+  active: 1
   type:
     m_OverrideState: 1
     m_Value: 4
   intensity:
     m_OverrideState: 1
-    m_Value: 0.214
+    m_Value: 0.232
   response:
     m_OverrideState: 0
     m_Value: 0.8
@@ -94,6 +94,8 @@ MonoBehaviour:
   - {fileID: -7090762082273566055}
   - {fileID: 4071955612763978948}
   - {fileID: 982960649558650753}
+  - {fileID: 5950697064073706248}
+  - {fileID: 5697207250647587833}
 --- !u!114 &982960649558650753
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -213,5 +215,52 @@ MonoBehaviour:
     m_OverrideState: 1
     m_Value: 0.65
   clamp:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0.176
+--- !u!114 &5697207250647587833
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5e1dc532bcb41949b58bc4f2abfbb7e, type: 3}
+  m_Name: LensDistortion
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.LensDistortion
+  active: 1
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0.163
+  xMultiplier:
+    m_OverrideState: 0
+    m_Value: 1
+  yMultiplier:
+    m_OverrideState: 0
+    m_Value: 1
+  center:
+    m_OverrideState: 1
+    m_Value: {x: 0.5, y: 0.35}
+  scale:
+    m_OverrideState: 0
+    m_Value: 0.01
+--- !u!114 &5950697064073706248
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb60a22f311433c4c962b888d1393f88, type: 3}
+  m_Name: PaniniProjection
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.PaniniProjection
+  active: 1
+  distance:
+    m_OverrideState: 1
+    m_Value: 0.434
+  cropToFit:
+    m_OverrideState: 0
+    m_Value: 1

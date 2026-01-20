@@ -7,7 +7,7 @@ public class Enemy : MonoBehaviour
 {
     [SerializeField] Vector3 target = Vector3.zero;
     [SerializeField] string trashTag = "TrashPile";
-    [SerializeField] float gameEdge = 50;
+    [SerializeField] float gameEdge = 40;
     [SerializeField] GameObject trashDisplay;
     [SerializeField] GameObject droppedTrashPrefab;
     [SerializeField] int maxHealth = 4;
@@ -86,8 +86,8 @@ public class Enemy : MonoBehaviour
             
             if (pile.trashAmount > 0) {
                 Debug.Log("Stealing Trash");
-                pile.StealTrash(1);
-                trashAmount = 1;
+                pile.StealTrash(9);
+                trashAmount = 9;
                 trashDisplay.SetActive(true);
             }
         }
